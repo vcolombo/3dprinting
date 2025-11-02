@@ -138,7 +138,7 @@ bambu_studio/
 
 - Lines 1-8: Header with plate info and optimization notes
 - Lines 15-95: Machine initialization and airduct setup
-- Lines 95-225: Parallel bed + nozzle heating with M109 waits for both
+- Lines 95-215: Parallel bed + nozzle heating with M109 waits for both
 - Lines 225-405: Homing, detection, material prep, extrusion calibration
 - Lines 405-420: Chamber heating start (M141, parallel with leveling)
 - Lines 420-445: Bed leveling at standby temps (no redundant M190)

@@ -85,6 +85,7 @@ The start G-code implements aggressive optimizations to minimize print start tim
 - Eliminated 2 redundant `M190 S[bed_temperature_initial_layer_single]` calls
 - Changed detection pre-heat from -80°C to -50°C offset
 - **Total time savings: 75-180 seconds per print** (45-120s from heating + 30-60s from chamber parallelization)
+  > _Note: These are theoretical calculations based on typical heating and chamber warmup times for PLA on G10 plate (75s savings) and PA on CFX plate with chamber heating (180s savings). Actual results may vary depending on material, build plate, and machine configuration._
 
 **Status Messages**: Added `M1002 gcode_claim_action` commands throughout to display progress in Bambu Studio:
 

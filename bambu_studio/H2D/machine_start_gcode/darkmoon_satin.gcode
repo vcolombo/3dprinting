@@ -101,6 +101,19 @@ M1002 gcode_claim_action : 2
 M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed temp from filament settings
 
 ; Start nozzle heating to material-specific standby temperature (both heating in parallel)
+;
+; ============================================================================
+; STANDBY TEMPERATURE CONFIGURATION - SECTION 1 OF 3
+; ============================================================================
+; IMPORTANT: Standby temperatures are duplicated in THREE locations:
+;   1. M104 commands (lines 105-157) - Initial nozzle heating
+;   2. M109 commands (lines 162-214) - Wait for nozzle temp
+;   3. G383 commands (lines 459-511) - Z offset calibration temp
+;
+; This is a KNOWN LIMITATION of Bambu Studio's hardcoded approach.
+; Any temperature change requires updating ALL THREE sections per material.
+; See copilot-instructions.md for details on the hardcoded configuration pattern.
+; ============================================================================
 M1002 gcode_claim_action : 10
 ; SECTION 1/3: Standby temp initialization - must match temps in M109 wait (Section 2/3) and G383 Z offset (Section 3/3)
 {if filament_type[initial_no_support_extruder]=="PLA"}
@@ -159,8 +172,9 @@ M104 S140 A          ; Support: standby temp 140C
 {endif}
 
 ; Wait for both bed and nozzle to reach temperature
+; NOTE: These M109 temperatures must match the M104 set temperatures above (lines 107-158)
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
-; SECTION 2/3: Standby temp wait - must match temps in M104 init (Section 1/3) and G383 Z offset (Section 3/3)
+; STANDBY TEMPERATURE CONFIGURATION - SECTION 2 OF 3 (see lines 103-118 for reference)
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M109 S140 A          ; wait for nozzle standby temp
 {endif}
@@ -457,7 +471,7 @@ M623
 ;===== z ofst cali start =====
 
     ; Bed and nozzle already at temp (no need to re-wait)
-    ; SECTION 3/3: Z offset calibration temp - must match temps in M104 init (Section 1/3) and M109 wait (Section 2/3)
+    ; STANDBY TEMPERATURE CONFIGURATION - SECTION 3 OF 3 (see lines 103-118 for reference)
 
     {if filament_type[initial_no_support_extruder]=="PLA"}
     G383 O0 M2 T140

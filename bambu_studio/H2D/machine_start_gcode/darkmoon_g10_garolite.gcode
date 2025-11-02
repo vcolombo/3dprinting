@@ -92,15 +92,14 @@ G90
 {endif}
 ;==== set airduct mode ==== 
 
-;===== OPTIMIZED: Bed heating first, nozzle at material-specific standby temp ==========
+;===== OPTIMIZED: Parallel bed + nozzle heating to material-specific standby temp ==========
 M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
 
-; Set bed to target temperature and wait
+; Start bed heating (don't wait yet)
 M1002 gcode_claim_action : 2
 M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed temp from filament settings
-M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait until bed reaches temp
 
-; Set nozzle to material-specific standby temperature (for bed leveling and soak)
+; Start nozzle heating to material-specific standby temperature (both heating in parallel)
 M1002 gcode_claim_action : 10
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M104 S140 A          ; PLA: standby temp 140C
@@ -157,6 +156,63 @@ M104 S140 A          ; PVA: standby temp 140C
 M104 S140 A          ; Support: standby temp 140C
 {endif}
 
+; Wait for both bed and nozzle to reach temperature
+M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
+{if filament_type[initial_no_support_extruder]=="PLA"}
+M109 S140 A          ; wait for nozzle standby temp
+{endif}
+{if filament_type[initial_no_support_extruder]=="PLA-CF"}
+M109 S145 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PETG"}
+M109 S160 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PETG-CF"}
+M109 S165 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="TPU"}
+M109 S120 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="ABS"}
+M109 S170 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="ASA"}
+M109 S170 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PC"}
+M109 S200 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PA"}
+M109 S190 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PA-CF"}
+M109 S190 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PA6-GF"}
+M109 S190 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PA6-CF"}
+M109 S190 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PAHT-CF"}
+M109 S200 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PET-CF"}
+M109 S210 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PPA-CF"}
+M109 S220 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PPS-CF"}
+M109 S240 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="PVA"}
+M109 S140 A
+{endif}
+{if filament_type[initial_no_support_extruder]=="Support"}
+M109 S140 A
+{endif}
+
 ;===== first homing start =====
 M1002 gcode_claim_action : 13
 
@@ -192,7 +248,7 @@ M400
     T1001
     G383.4 ; left-extruder load status detection
     
-    M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-80} A ; rise temp in advance
+    M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]-50} A ; rise temp more aggressively (optimization)
 
 M1002 judge_flag build_plate_detect_flag
 M622 S1
@@ -352,8 +408,7 @@ M400
 
 M1002 judge_flag g29_before_print_flag
 
-M190 S[bed_temperature_initial_layer_single]; ensure bed temp
-; Nozzle already at material-specific standby temp from earlier heating
+; Bed and nozzle already at temp from earlier heating (no need to re-wait)
 
 M106 S0 ; turn off fan, too noisy
 
@@ -391,7 +446,7 @@ M623
 
 ;===== z ofst cali start =====
 
-    M190 S[bed_temperature_initial_layer_single]; ensure bed temp
+    ; Bed and nozzle already at temp (no need to re-wait)
 
     {if filament_type[initial_no_support_extruder]=="PLA"}
     G383 O0 M2 T140

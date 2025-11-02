@@ -70,13 +70,15 @@ The start G-code implements a specific optimization to minimize print start time
 5. **Chamber heating and material soak** (~line 515): Dwell at standby temp for plate-specific duration
 6. **Final heating** (~line 630): Rise to print temperature just before printing
 
-**Why this matters**: 
+**Why this matters**:
+
 - **Parallel heating** saves 30-90 seconds by heating bed and nozzle simultaneously instead of sequentially
 - **No redundant waits** - bed/nozzle temps are maintained throughout, no need to re-check before leveling or Z offset
 - **Aggressive pre-heating** during detection phase (print_temp - 50°C instead of -80°C) saves 10-20 seconds
 - Traditional sequences waste time with sequential heating and redundant temperature checks
 
 **Key optimizations implemented**:
+
 - Removed sequential M190 → M104 pattern in favor of M140 → M104 → M190 → M109 (parallel)
 - Eliminated 2 redundant `M190 S[bed_temperature_initial_layer_single]` calls (before leveling and Z offset)
 - Changed detection phase pre-heat from -80°C to -50°C offset for faster approach to standby temp

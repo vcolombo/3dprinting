@@ -37,7 +37,7 @@
 {global_variable_3 pa6gf_soak_time=180}       ; Satin: 3 min - Sometimes preheat
 {global_variable_3 pa6cf_soak_time=180}       ; Satin: 3 min - Sometimes preheat
 {global_variable_3 pahtcf_soak_time=180}      ; Satin: 3 min - Sometimes preheat
-{global_variable_3 petcf_soak_time=150}       ; Satin: 2.5 min - Sometimes preheat (lighter)
+{global_variable_3 petcf_soak_time=150}       ; Satin: 2.5 min - Sometimes preheat (shorter than PA-based materials)
 {global_variable_3 ppacf_soak_time=180}       ; Satin: 3 min - Sometimes preheat
 {global_variable_3 ppscf_soak_time=180}       ; Satin: 3 min - Sometimes preheat
 {global_variable_3 pva_soak_time=0}           ; Satin: No preheat (similar to PLA)

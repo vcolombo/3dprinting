@@ -115,11 +115,12 @@ M104 S160 A          ; PETG: standby temp 160C
 
 **Supported materials**: PLA, PLA-CF, PETG, PETG-CF, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support
 
-**Three sections require updates** when adding materials:
+**Four sections require updates** when adding materials:
 
-1. Standby temperature assignment (~line 100-160)
-2. Material soak time (~line 420-480)
+1. Standby temperature assignment (M104) (~line 100-160)
+2. M109 wait for standby temperature (~line 160-215)
 3. Z offset calibration temperature (~line 395-450)
+4. Material soak time (~line 420-480)
 
 ## File Organization
 
@@ -150,7 +151,7 @@ bambu_studio/
 
 ### Adding New Filament Type
 
-Must update **three locations in each of three files** (9 edits total):
+Must update **four locations in each of three files** (12 edits total):
 
 1. **Standby temp section** (~line 100):
 
@@ -160,7 +161,15 @@ Must update **three locations in each of three files** (9 edits total):
    {endif}
    ```
 
-2. **Z offset calibration** (~line 395):
+2. **M109 wait section** (~line 160):
+
+   ```gcode
+   {if filament_type[initial_no_support_extruder]=="NEWMAT"}
+   M109 S170 A          ; wait for nozzle standby temp
+   {endif}
+   ```
+
+3. **Z offset calibration** (~line 395):
 
    ```gcode
    {if filament_type[initial_no_support_extruder]=="NEWMAT"}
@@ -168,7 +177,7 @@ Must update **three locations in each of three files** (9 edits total):
    {endif}
    ```
 
-3. **Material soak** (~line 420, **plate-specific times**):
+4. **Material soak** (~line 420, **plate-specific times**):
    ```gcode
    {if filament_type[initial_no_support_extruder]=="NEWMAT"}
    G4 S120              ; NEWMAT: soak 120s (adjust per plate)

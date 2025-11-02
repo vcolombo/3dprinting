@@ -101,8 +101,19 @@ M1002 gcode_claim_action : 2
 M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed temp from filament settings
 
 ; Start nozzle heating to material-specific standby temperature (both heating in parallel)
-; NOTE: These M104 temperatures must match the M109 wait temperatures below (lines 165-216)
-; M104 = set temperature (non-blocking), M109 = wait for temperature (blocking)
+;
+; ============================================================================
+; STANDBY TEMPERATURE CONFIGURATION - SECTION 1 OF 3
+; ============================================================================
+; IMPORTANT: Standby temperatures are duplicated in THREE locations:
+;   1. M104 commands (lines 105-157) - Initial nozzle heating
+;   2. M109 commands (lines 162-214) - Wait for nozzle temp
+;   3. G383 commands (lines 459-511) - Z offset calibration temp
+;
+; This is a KNOWN LIMITATION of Bambu Studio's hardcoded approach.
+; Any temperature change requires updating ALL THREE sections per material.
+; See copilot-instructions.md for details on the hardcoded configuration pattern.
+; ============================================================================
 M1002 gcode_claim_action : 10
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M104 S140 A          ; PLA: standby temp 140C
@@ -162,6 +173,7 @@ M104 S140 A          ; Support: standby temp 140C
 ; Wait for both bed and nozzle to reach temperature
 ; NOTE: These M109 temperatures must match the M104 set temperatures above (lines 107-158)
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
+; STANDBY TEMPERATURE CONFIGURATION - SECTION 2 OF 3 (see lines 103-118 for reference)
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M109 S140 A          ; wait for nozzle standby temp
 {endif}
@@ -458,60 +470,61 @@ M623
 ;===== z ofst cali start =====
 
     ; Bed and nozzle already at temp (no need to re-wait)
+    ; STANDBY TEMPERATURE CONFIGURATION - SECTION 3 OF 3 (see lines 103-118 for reference)
 
     {if filament_type[initial_no_support_extruder]=="PLA"}
-    G383 O0 M2 T140
+    G383 O0 M2 T[pla_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PLA-CF"}
-    G383 O0 M2 T145
+    G383 O0 M2 T[placf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PETG"}
-    G383 O0 M2 T160
+    G383 O0 M2 T[petg_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PETG-CF"}
-    G383 O0 M2 T165
+    G383 O0 M2 T[petgcf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="TPU"}
-    G383 O0 M2 T120
+    G383 O0 M2 T[tpu_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="ABS"}
-    G383 O0 M2 T170
+    G383 O0 M2 T[abs_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="ASA"}
-    G383 O0 M2 T170
+    G383 O0 M2 T[asa_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PC"}
-    G383 O0 M2 T200
+    G383 O0 M2 T[pc_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PA"}
-    G383 O0 M2 T190
+    G383 O0 M2 T[pa_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PA-CF"}
-    G383 O0 M2 T190
+    G383 O0 M2 T[pacf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PA6-GF"}
-    G383 O0 M2 T190
+    G383 O0 M2 T[pa6gf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PA6-CF"}
-    G383 O0 M2 T190
+    G383 O0 M2 T[pa6cf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PAHT-CF"}
-    G383 O0 M2 T200
+    G383 O0 M2 T[pahtcf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PET-CF"}
-    G383 O0 M2 T210
+    G383 O0 M2 T[petcf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PPA-CF"}
-    G383 O0 M2 T220
+    G383 O0 M2 T[ppacf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PPS-CF"}
-    G383 O0 M2 T240
+    G383 O0 M2 T[ppscf_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="PVA"}
-    G383 O0 M2 T140
+    G383 O0 M2 T[pva_standby_temp]
     {endif}
     {if filament_type[initial_no_support_extruder]=="Support"}
-    G383 O0 M2 T140
+    G383 O0 M2 T[support_standby_temp]
     {endif}
     M500
 

@@ -24,9 +24,9 @@ M104 S140 A          ; PLA: standby temp 140C
 
 **When adding new filament support**:
 
-1. Add conditional block with hardcoded standby temp in the standby temperature section (~line 100)
-2. Add conditional block with hardcoded soak time in the material soak section (~line 420)
-3. Add conditional block with hardcoded temp in Z offset calibration section (~line 395)
+1. Add conditional block with hardcoded standby temp in the standby temperature section (after M1002 set_filament_type)
+2. Add conditional block with hardcoded soak time in the material soak section (after chamber heating and before final nozzle heating)
+3. Add conditional block with hardcoded temp in Z offset calibration section (after bed leveling and before Z offset adjustment)
 4. **Repeat for ALL three plate configurations** - soak times vary by plate thermal properties
 
 ### Build Plate Specific Configurations
@@ -84,7 +84,9 @@ The start G-code implements aggressive optimizations to minimize print start tim
 - Chamber heating moved from after Z offset to before leveling (M141 at ~line 410 instead of ~line 520)
 - Eliminated 2 redundant `M190 S[bed_temperature_initial_layer_single]` calls
 - Changed detection pre-heat from -80°C to -50°C offset
-- **Total time savings: 75-180 seconds per print** (45-120s from heating + 30-60s from chamber parallelization)
+- **Total time savings: 75-180 seconds per print** (see breakdown below)
+  > _Note: These are theoretical calculations based on typical heating and chamber warmup times for PLA on G10 plate (75s savings) and PA on CFX plate with chamber heating (180s savings). Actual results may vary depending on material, build plate, and machine configuration._
+  > _Calculation breakdown: 30-90s from parallel bed/nozzle heating, 30-60s from chamber parallelization (overlapping with leveling/Z offset), and 15-30s from eliminated redundant waits and more aggressive pre-heating. The lower bound (75s) reflects PLA on G10 with no chamber heating; the upper bound (180s) reflects PA on CFX with chamber heating and all optimizations active._
 
 **Status Messages**: Added `M1002 gcode_claim_action` commands throughout to display progress in Bambu Studio:
 
@@ -115,11 +117,12 @@ M104 S160 A          ; PETG: standby temp 160C
 
 **Supported materials**: PLA, PLA-CF, PETG, PETG-CF, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support
 
-**Three sections require updates** when adding materials:
+**Four sections require updates** when adding materials:
 
-1. Standby temperature assignment (~line 100-160)
-2. Material soak time (~line 420-480)
+1. Standby temperature assignment (M104) (~line 100-160)
+2. M109 wait for standby temperature (~line 160-215)
 3. Z offset calibration temperature (~line 395-450)
+4. Material soak time (~line 420-480)
 
 ## File Organization
 
@@ -138,7 +141,7 @@ bambu_studio/
 
 - Lines 1-8: Header with plate info and optimization notes
 - Lines 15-95: Machine initialization and airduct setup
-- Lines 95-225: Parallel bed + nozzle heating with M109 waits for both
+- Lines 95-215: Parallel bed + nozzle heating with M109 waits for both
 - Lines 225-405: Homing, detection, material prep, extrusion calibration
 - Lines 405-420: Chamber heating start (M141, parallel with leveling)
 - Lines 420-445: Bed leveling at standby temps (no redundant M190)
@@ -150,7 +153,7 @@ bambu_studio/
 
 ### Adding New Filament Type
 
-Must update **three locations in each of three files** (9 edits total):
+Must update **four locations in each of three files** (12 edits total):
 
 1. **Standby temp section** (~line 100):
 
@@ -160,7 +163,15 @@ Must update **three locations in each of three files** (9 edits total):
    {endif}
    ```
 
-2. **Z offset calibration** (~line 395):
+2. **M109 wait section** (~line 160):
+
+   ```gcode
+   {if filament_type[initial_no_support_extruder]=="NEWMAT"}
+   M109 S170 A          ; wait for nozzle standby temp
+   {endif}
+   ```
+
+3. **Z offset calibration** (~line 395):
 
    ```gcode
    {if filament_type[initial_no_support_extruder]=="NEWMAT"}
@@ -168,7 +179,7 @@ Must update **three locations in each of three files** (9 edits total):
    {endif}
    ```
 
-3. **Material soak** (~line 420, **plate-specific times**):
+4. **Material soak** (~line 420, **plate-specific times**):
    ```gcode
    {if filament_type[initial_no_support_extruder]=="NEWMAT"}
    G4 S120              ; NEWMAT: soak 120s (adjust per plate)

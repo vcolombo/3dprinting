@@ -101,6 +101,19 @@ M1002 gcode_claim_action : 2
 M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed temp from filament settings
 
 ; Start nozzle heating to material-specific standby temperature (both heating in parallel)
+;
+; ============================================================================
+; STANDBY TEMPERATURE CONFIGURATION - SECTION 1 OF 3
+; ============================================================================
+; IMPORTANT: Standby temperatures are duplicated in THREE locations:
+;   1. M104 commands (lines 105-157) - Initial nozzle heating
+;   2. M109 commands (lines 162-214) - Wait for nozzle temp
+;   3. G383 commands (lines 459-511) - Z offset calibration temp
+;
+; This is a KNOWN LIMITATION of Bambu Studio's hardcoded approach.
+; Any temperature change requires updating ALL THREE sections per material.
+; See copilot-instructions.md for details on the hardcoded configuration pattern.
+; ============================================================================
 M1002 gcode_claim_action : 10
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M104 S140 A          ; PLA: standby temp 140C
@@ -159,6 +172,7 @@ M104 S140 A          ; Support: standby temp 140C
 
 ; Wait for both bed and nozzle to reach temperature
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
+; STANDBY TEMPERATURE CONFIGURATION - SECTION 2 OF 3 (see lines 103-118 for reference)
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M109 S140 A          ; wait for nozzle standby temp
 {endif}
@@ -455,6 +469,7 @@ M623
 ;===== z ofst cali start =====
 
     ; Bed and nozzle already at temp (no need to re-wait)
+    ; STANDBY TEMPERATURE CONFIGURATION - SECTION 3 OF 3 (see lines 103-118 for reference)
 
     {if filament_type[initial_no_support_extruder]=="PLA"}
     G383 O0 M2 T[pla_standby_temp]

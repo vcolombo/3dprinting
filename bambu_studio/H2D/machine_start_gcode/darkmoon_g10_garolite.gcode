@@ -410,6 +410,13 @@ M1002 judge_flag g29_before_print_flag
 
 ; Bed and nozzle already at temp from earlier heating (no need to re-wait)
 
+; Start chamber heating NOW (parallel with leveling/Z offset to save time)
+{if (overall_chamber_temperature >= 40)}
+    M145 P1 ; set airduct mode to heating mode
+    M141 S[overall_chamber_temperature] ; Start chamber heating (non-blocking)
+    M1002 gcode_claim_action : 49
+{endif}
+
 M106 S0 ; turn off fan, too noisy
 
 G91
@@ -514,11 +521,9 @@ M400
 
 ;===== OPTIMIZED: Chamber heating and material soak AFTER leveling =====
 
+; Wait for chamber temp (started earlier during leveling for parallel operation)
 {if (overall_chamber_temperature >= 40)}
-    M145 P1 ; set airduct mode to heating mode
-    M141 S[overall_chamber_temperature] ; Let Chamber begin to heat
-    M1002 gcode_claim_action : 49
-    M191 S[overall_chamber_temperature] ; wait for chamber temp
+    M191 S[overall_chamber_temperature] ; wait for chamber temp (already heating since leveling)
 {endif}
 
 ; Material-specific soak times (nozzle already at standby temp from earlier)

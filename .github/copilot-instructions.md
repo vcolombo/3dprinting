@@ -24,9 +24,9 @@ M104 S140 A          ; PLA: standby temp 140C
 
 **When adding new filament support**:
 
-1. Add conditional block with hardcoded standby temp in the standby temperature section (~line 100)
-2. Add conditional block with hardcoded soak time in the material soak section (~line 420)
-3. Add conditional block with hardcoded temp in Z offset calibration section (~line 395)
+1. Add conditional block with hardcoded standby temp in the standby temperature section (after M1002 set_filament_type)
+2. Add conditional block with hardcoded soak time in the material soak section (after chamber heating and before final nozzle heating)
+3. Add conditional block with hardcoded temp in Z offset calibration section (after bed leveling and before Z offset adjustment)
 4. **Repeat for ALL three plate configurations** - soak times vary by plate thermal properties
 
 ### Build Plate Specific Configurations

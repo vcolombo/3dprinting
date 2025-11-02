@@ -23,7 +23,8 @@ bambu_studio/
 
 - **Thermal Property**: Moderate insulator (glass-reinforced epoxy)
 - **Use Case**: Baseline configuration, reliable for most materials
-- **Soak Times**: Standard (PLA: 60s, PETG: 90s, Engineering: 240-330s)
+- **Soak Times**: Standard (PLA: 30s, PETG: 90s, Engineering: 240-330s)
+- **Product Page**: [G10 Build Plate](https://darkmoon3d.com/products/bambu-lab-g10-build-plate)
 
 ### Darkmoon CFX Carbon Fiber
 
@@ -41,13 +42,14 @@ bambu_studio/
 
 ## Features
 
-- **Variable-Driven Configuration**: All material-specific parameters defined at top of file for easy customization
+- **Material-Specific Configuration**: Hardcoded material-specific standby temperatures and soak times optimized for each build plate
 - **18 Filament Types Supported**: PLA, PLA-CF, PETG, PETG-CF, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support
 - **Optimized Heating Sequence**:
-  1. Heat bed first
-  2. Bed leveling at material-specific standby temps
-  3. Chamber heating and soak (plate-specific times)
+  1. Heat bed first with status display
+  2. Bed leveling at material-specific standby temps (no oozing)
+  3. Chamber heating and material soak (plate-specific times)
   4. Final heating to print temperature
+- **Enhanced Status Messages**: Continuous status updates throughout the entire start sequence for better visibility in Bambu Studio
 
 ## Usage
 

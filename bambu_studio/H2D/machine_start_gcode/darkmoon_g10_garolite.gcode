@@ -6,48 +6,6 @@
 ;===== G10 Note: Glass-reinforced epoxy laminate with moderate thermal insulation ======
 ;===== G10 WARNING: Material types not listed on product page are not generally recommended ======
 
-;===== FILAMENT-SPECIFIC VARIABLES =====
-; Standby temperatures (for bed leveling and soak)
-{global_variable_3 pla_standby_temp=140}
-{global_variable_3 placf_standby_temp=145}
-{global_variable_3 petg_standby_temp=160}
-{global_variable_3 petgcf_standby_temp=165}
-{global_variable_3 tpu_standby_temp=120}
-{global_variable_3 abs_standby_temp=170}
-{global_variable_3 asa_standby_temp=170}
-{global_variable_3 pc_standby_temp=200}
-{global_variable_3 pa_standby_temp=190}
-{global_variable_3 pacf_standby_temp=190}
-{global_variable_3 pa6gf_standby_temp=190}
-{global_variable_3 pa6cf_standby_temp=190}
-{global_variable_3 pahtcf_standby_temp=200}
-{global_variable_3 petcf_standby_temp=210}
-{global_variable_3 ppacf_standby_temp=220}
-{global_variable_3 ppscf_standby_temp=240}
-{global_variable_3 pva_standby_temp=140}
-{global_variable_3 support_standby_temp=140}
-
-; Soak times (in seconds)
-{global_variable_3 pla_soak_time=30}
-{global_variable_3 placf_soak_time=30}
-{global_variable_3 petg_soak_time=90}
-{global_variable_3 petgcf_soak_time=90}
-{global_variable_3 tpu_soak_time=0}
-{global_variable_3 abs_soak_time=240}
-{global_variable_3 asa_soak_time=240}
-{global_variable_3 pc_soak_time=300}
-{global_variable_3 pa_soak_time=300}
-{global_variable_3 pacf_soak_time=300}
-{global_variable_3 pa6gf_soak_time=300}
-{global_variable_3 pa6cf_soak_time=300}
-{global_variable_3 pahtcf_soak_time=300}
-{global_variable_3 petcf_soak_time=240}
-{global_variable_3 ppacf_soak_time=330}
-{global_variable_3 ppscf_soak_time=330}
-{global_variable_3 pva_soak_time=30}
-{global_variable_3 support_soak_time=30}
-;===== END FILAMENT-SPECIFIC VARIABLES =====
-
 ;M1002 set_flag extrude_cali_flag=1
 ;M1002 set_flag g29_before_print_flag=1
 ;M1002 set_flag auto_cali_toolhead_offset_flag=1
@@ -138,63 +96,65 @@ G90
 M1002 set_filament_type:{filament_type[initial_no_support_extruder]}
 
 ; Set bed to target temperature and wait
+M1002 gcode_claim_action : 2
 M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed temp from filament settings
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait until bed reaches temp
 
 ; Set nozzle to material-specific standby temperature (for bed leveling and soak)
+M1002 gcode_claim_action : 10
 {if filament_type[initial_no_support_extruder]=="PLA"}
-M104 S[pla_standby_temp] A          ; PLA: standby temp
+M104 S140 A          ; PLA: standby temp 140C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PLA-CF"}
-M104 S[placf_standby_temp] A          ; PLA-CF: standby temp
+M104 S145 A          ; PLA-CF: standby temp 145C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PETG"}
-M104 S[petg_standby_temp] A          ; PETG: standby temp
+M104 S160 A          ; PETG: standby temp 160C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PETG-CF"}
-M104 S[petgcf_standby_temp] A          ; PETG-CF: standby temp
+M104 S165 A          ; PETG-CF: standby temp 165C
 {endif}
 {if filament_type[initial_no_support_extruder]=="TPU"}
-M104 S[tpu_standby_temp] A          ; TPU: standby temp
+M104 S120 A          ; TPU: standby temp 120C
 {endif}
 {if filament_type[initial_no_support_extruder]=="ABS"}
-M104 S[abs_standby_temp] A          ; ABS: standby temp
+M104 S170 A          ; ABS: standby temp 170C
 {endif}
 {if filament_type[initial_no_support_extruder]=="ASA"}
-M104 S[asa_standby_temp] A          ; ASA: standby temp
+M104 S170 A          ; ASA: standby temp 170C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PC"}
-M104 S[pc_standby_temp] A          ; PC: standby temp
+M104 S200 A          ; PC: standby temp 200C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA"}
-M104 S[pa_standby_temp] A          ; PA (Nylon): standby temp
+M104 S190 A          ; PA (Nylon): standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA-CF"}
-M104 S[pacf_standby_temp] A          ; PA-CF: standby temp
+M104 S190 A          ; PA-CF: standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA6-GF"}
-M104 S[pa6gf_standby_temp] A          ; PA6-GF: standby temp
+M104 S190 A          ; PA6-GF: standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA6-CF"}
-M104 S[pa6cf_standby_temp] A          ; PA6-CF: standby temp
+M104 S190 A          ; PA6-CF: standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PAHT-CF"}
-M104 S[pahtcf_standby_temp] A          ; PAHT-CF: standby temp
+M104 S200 A          ; PAHT-CF: standby temp 200C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PET-CF"}
-M104 S[petcf_standby_temp] A          ; PET-CF: standby temp
+M104 S210 A          ; PET-CF: standby temp 210C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PPA-CF"}
-M104 S[ppacf_standby_temp] A          ; PPA-CF: standby temp
+M104 S220 A          ; PPA-CF: standby temp 220C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PPS-CF"}
-M104 S[ppscf_standby_temp] A          ; PPS-CF: standby temp
+M104 S240 A          ; PPS-CF: standby temp 240C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PVA"}
-M104 S[pva_standby_temp] A          ; PVA: standby temp
+M104 S140 A          ; PVA: standby temp 140C
 {endif}
 {if filament_type[initial_no_support_extruder]=="Support"}
-M104 S[support_standby_temp] A          ; Support: standby temp
+M104 S140 A          ; Support: standby temp 140C
 {endif}
 
 ;===== first homing start =====
@@ -433,7 +393,60 @@ M623
 
     M190 S[bed_temperature_initial_layer_single]; ensure bed temp
 
+    {if filament_type[initial_no_support_extruder]=="PLA"}
     G383 O0 M2 T140
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PLA-CF"}
+    G383 O0 M2 T145
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PETG"}
+    G383 O0 M2 T160
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PETG-CF"}
+    G383 O0 M2 T165
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="TPU"}
+    G383 O0 M2 T120
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="ABS"}
+    G383 O0 M2 T170
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="ASA"}
+    G383 O0 M2 T170
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PC"}
+    G383 O0 M2 T200
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PA"}
+    G383 O0 M2 T190
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PA-CF"}
+    G383 O0 M2 T190
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PA6-GF"}
+    G383 O0 M2 T190
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PA6-CF"}
+    G383 O0 M2 T190
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PAHT-CF"}
+    G383 O0 M2 T200
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PET-CF"}
+    G383 O0 M2 T210
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PPA-CF"}
+    G383 O0 M2 T220
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PPS-CF"}
+    G383 O0 M2 T240
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="PVA"}
+    G383 O0 M2 T140
+    {endif}
+    {if filament_type[initial_no_support_extruder]=="Support"}
+    G383 O0 M2 T140
+    {endif}
     M500
 
 ;===== z ofst cali end =====
@@ -454,59 +467,60 @@ M400
 {endif}
 
 ; Material-specific soak times (nozzle already at standby temp from earlier)
+M1002 gcode_claim_action : 18
 {if filament_type[initial_no_support_extruder]=="PLA"}
-G4 S[pla_soak_time]               ; PLA: soak
+G4 S30               ; PLA: soak 30s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PLA-CF"}
-G4 S[placf_soak_time]               ; PLA-CF: soak
+G4 S30               ; PLA-CF: soak 30s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PETG"}
-G4 S[petg_soak_time]               ; PETG: soak
+G4 S90               ; PETG: soak 90s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PETG-CF"}
-G4 S[petgcf_soak_time]               ; PETG-CF: soak
+G4 S90               ; PETG-CF: soak 90s
 {endif}
 {if filament_type[initial_no_support_extruder]=="TPU"}
-G4 S[tpu_soak_time]               ; TPU: soak
+G4 S0               ; TPU: soak 0s (no preheat)
 {endif}
 {if filament_type[initial_no_support_extruder]=="ABS"}
-G4 S[abs_soak_time]              ; ABS: soak
+G4 S240              ; ABS: soak 240s
 {endif}
 {if filament_type[initial_no_support_extruder]=="ASA"}
-G4 S[asa_soak_time]              ; ASA: soak
+G4 S240              ; ASA: soak 240s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PC"}
-G4 S[pc_soak_time]              ; PC: soak
+G4 S300              ; PC: soak 300s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA"}
-G4 S[pa_soak_time]              ; PA: soak
+G4 S300              ; PA: soak 300s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA-CF"}
-G4 S[pacf_soak_time]              ; PA-CF: soak
+G4 S300              ; PA-CF: soak 300s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA6-GF"}
-G4 S[pa6gf_soak_time]              ; PA6-GF: soak
+G4 S300              ; PA6-GF: soak 300s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA6-CF"}
-G4 S[pa6cf_soak_time]              ; PA6-CF: soak
+G4 S300              ; PA6-CF: soak 300s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PAHT-CF"}
-G4 S[pahtcf_soak_time]              ; PAHT-CF: soak
+G4 S300              ; PAHT-CF: soak 300s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PET-CF"}
-G4 S[petcf_soak_time]              ; PET-CF: soak
+G4 S240              ; PET-CF: soak 240s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PPA-CF"}
-G4 S[ppacf_soak_time]              ; PPA-CF: soak
+G4 S330              ; PPA-CF: soak 330s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PPS-CF"}
-G4 S[ppscf_soak_time]              ; PPS-CF: soak
+G4 S330              ; PPS-CF: soak 330s
 {endif}
 {if filament_type[initial_no_support_extruder]=="PVA"}
-G4 S[pva_soak_time]               ; PVA: soak
+G4 S30               ; PVA: soak 30s
 {endif}
 {if filament_type[initial_no_support_extruder]=="Support"}
-G4 S[support_soak_time]               ; Support: soak
+G4 S30               ; Support: soak 30s
 {endif}
 
 ;====== cog noise reduction=================
@@ -602,8 +616,10 @@ M400
 
 ;===== wait temperature reaching the reference value =======
 
+M1002 gcode_claim_action : 10
 M104 S{nozzle_temperature_initial_layer[initial_no_support_extruder]} ; rise to print temp
 
+M1002 gcode_claim_action : 2
 M140 S[bed_temperature_initial_layer_single] 
 M190 S[bed_temperature_initial_layer_single] 
 
@@ -650,6 +666,7 @@ G1 Y265 F18000
     G1 Z0.8 F1200
     G90
     G1 X250 F60000
+    M1002 gcode_claim_action : 10
     M109 S{nozzle_temperature_initial_layer[initial_no_support_extruder]}
     M83
     G1 E5 F{filament_max_volumetric_speed[initial_no_support_extruder]/2/2.4053*60}

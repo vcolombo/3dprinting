@@ -42,7 +42,7 @@ bambu_studio/
 ## Features
 
 - **Variable-Driven Configuration**: All material-specific parameters defined at top of file for easy customization
-- **16 Filament Types Supported**: PLA, PETG, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support
+- **18 Filament Types Supported**: PLA, PLA-CF, PETG, PETG-CF, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support
 - **Optimized Heating Sequence**:
   1. Heat bed first
   2. Bed leveling at material-specific standby temps

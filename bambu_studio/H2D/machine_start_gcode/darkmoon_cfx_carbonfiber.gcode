@@ -101,6 +101,8 @@ M1002 gcode_claim_action : 2
 M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed temp from filament settings
 
 ; Start nozzle heating to material-specific standby temperature (both heating in parallel)
+; NOTE: These M104 temperatures must EXACTLY match the M109 temperatures below (lines 162-215)
+; Any change to a standby temperature must be updated in BOTH locations for correct operation
 M1002 gcode_claim_action : 10
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M104 S140 A          ; PLA: standby temp
@@ -158,6 +160,8 @@ M104 S140 A          ; Support: standby temp
 {endif}
 
 ; Wait for both bed and nozzle to reach temperature
+; NOTE: These M109 temperatures must EXACTLY match the M104 temperatures above (lines 105-158)
+; M104 starts heating (non-blocking), M109 waits for temperature (blocking)
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M109 S140 A          ; wait for nozzle standby temp

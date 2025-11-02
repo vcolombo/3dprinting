@@ -160,58 +160,58 @@ M104 S140 A          ; Support: standby temp
 ; Wait for both bed and nozzle to reach temperature
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
 {if filament_type[initial_no_support_extruder]=="PLA"}
-M109 S140 A          ; wait for nozzle standby temp
+M109 S140 A          ; PLA: wait for nozzle standby temp 140C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PLA-CF"}
-M109 S145 A
+M109 S145 A          ; PLA-CF: wait for nozzle standby temp 145C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PETG"}
-M109 S160 A
+M109 S160 A          ; PETG: wait for nozzle standby temp 160C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PETG-CF"}
-M109 S165 A
+M109 S165 A          ; PETG-CF: wait for nozzle standby temp 165C
 {endif}
 {if filament_type[initial_no_support_extruder]=="TPU"}
-M109 S120 A
+M109 S120 A          ; TPU: wait for nozzle standby temp 120C
 {endif}
 {if filament_type[initial_no_support_extruder]=="ABS"}
-M109 S170 A
+M109 S170 A          ; ABS: wait for nozzle standby temp 170C
 {endif}
 {if filament_type[initial_no_support_extruder]=="ASA"}
-M109 S170 A
+M109 S170 A          ; ASA: wait for nozzle standby temp 170C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PC"}
-M109 S200 A
+M109 S200 A          ; PC: wait for nozzle standby temp 200C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA"}
-M109 S190 A
+M109 S190 A          ; PA: wait for nozzle standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA-CF"}
-M109 S190 A
+M109 S190 A          ; PA-CF: wait for nozzle standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA6-GF"}
-M109 S190 A
+M109 S190 A          ; PA6-GF: wait for nozzle standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PA6-CF"}
-M109 S190 A
+M109 S190 A          ; PA6-CF: wait for nozzle standby temp 190C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PAHT-CF"}
-M109 S200 A
+M109 S200 A          ; PAHT-CF: wait for nozzle standby temp 200C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PET-CF"}
-M109 S210 A
+M109 S210 A          ; PET-CF: wait for nozzle standby temp 210C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PPA-CF"}
-M109 S220 A
+M109 S220 A          ; PPA-CF: wait for nozzle standby temp 220C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PPS-CF"}
-M109 S240 A
+M109 S240 A          ; PPS-CF: wait for nozzle standby temp 240C
 {endif}
 {if filament_type[initial_no_support_extruder]=="PVA"}
-M109 S140 A
+M109 S140 A          ; PVA: wait for nozzle standby temp 140C
 {endif}
 {if filament_type[initial_no_support_extruder]=="Support"}
-M109 S140 A
+M109 S140 A          ; Support: wait for nozzle standby temp 140C
 {endif}
 
 ;===== first homing start =====

@@ -171,6 +171,7 @@ M104 S140 A          ; Support: standby temp 140C
 {endif}
 
 ; Wait for both bed and nozzle to reach temperature
+; NOTE: These M109 temperatures must match the M104 set temperatures above (lines 107-158)
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
 ; STANDBY TEMPERATURE CONFIGURATION - SECTION 2 OF 3 (see lines 103-118 for reference)
 {if filament_type[initial_no_support_extruder]=="PLA"}

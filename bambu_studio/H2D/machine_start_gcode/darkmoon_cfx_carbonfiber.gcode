@@ -102,6 +102,7 @@ M140 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; set bed
 
 ; Start nozzle heating to material-specific standby temperature (both heating in parallel)
 M1002 gcode_claim_action : 10
+; SECTION 1/3: Standby temp initialization - must match temps in M109 wait (Section 2/3) and G383 Z offset (Section 3/3)
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M104 S140 A          ; PLA: standby temp
 {endif}
@@ -159,6 +160,7 @@ M104 S140 A          ; Support: standby temp
 
 ; Wait for both bed and nozzle to reach temperature
 M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait for bed
+; SECTION 2/3: Standby temp wait - must match temps in M104 init (Section 1/3) and G383 Z offset (Section 3/3)
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M109 S140 A          ; wait for nozzle standby temp
 {endif}
@@ -455,6 +457,7 @@ M623
 ;===== z ofst cali start =====
 
     ; Bed and nozzle already at temp (no need to re-wait)
+    ; SECTION 3/3: Z offset calibration temp - must match temps in M104 init (Section 1/3) and M109 wait (Section 2/3)
 
     {if filament_type[initial_no_support_extruder]=="PLA"}
     G383 O0 M2 T140

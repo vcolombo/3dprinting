@@ -55,7 +55,7 @@ M104 S[pla_standby_temp] A
 {endif}
 ```
 
-**Pattern**: 16 supported filament types (PLA, PETG, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support) each requiring:
+**Pattern**: 18 supported filament types (PLA, PLA-CF, PETG, PETG-CF, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support) each requiring:
 
 - Standby temperature definition (same across all plates)
 - Soak time definition (plate-specific)

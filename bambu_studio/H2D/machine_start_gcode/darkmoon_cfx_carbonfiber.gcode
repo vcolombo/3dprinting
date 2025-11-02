@@ -8,7 +8,9 @@
 ;===== FILAMENT-SPECIFIC VARIABLES =====
 ; Standby temperatures (for bed leveling and soak)
 {global_variable_3 pla_standby_temp=140}
+{global_variable_3 placf_standby_temp=145}
 {global_variable_3 petg_standby_temp=160}
+{global_variable_3 petgcf_standby_temp=165}
 {global_variable_3 tpu_standby_temp=120}
 {global_variable_3 abs_standby_temp=170}
 {global_variable_3 asa_standby_temp=170}
@@ -27,7 +29,9 @@
 ; Soak times (in seconds) - CFX requires longer soak due to carbon fiber insulation
 ; Based on official Darkmoon CFX User Guide preheat recommendations
 {global_variable_3 pla_soak_time=0}           ; CFX: No preheat recommended
+{global_variable_3 placf_soak_time=0}         ; CFX: No preheat (similar to PLA)
 {global_variable_3 petg_soak_time=180}        ; CFX: 3 min - ALWAYS preheat per manufacturer
+{global_variable_3 petgcf_soak_time=180}      ; CFX: 3 min - ALWAYS preheat (similar to PETG)
 {global_variable_3 tpu_soak_time=0}           ; CFX: ambient temp, no preheat
 {global_variable_3 abs_soak_time=240}         ; CFX: 4 min - YES preheat recommended
 {global_variable_3 asa_soak_time=240}         ; CFX: 4 min - YES preheat recommended
@@ -141,8 +145,14 @@ M190 S{bed_temperature_initial_layer[initial_no_support_extruder]}     ; wait un
 {if filament_type[initial_no_support_extruder]=="PLA"}
 M104 S[pla_standby_temp] A          ; PLA: standby temp
 {endif}
+{if filament_type[initial_no_support_extruder]=="PLA-CF"}
+M104 S[placf_standby_temp] A          ; PLA-CF: standby temp
+{endif}
 {if filament_type[initial_no_support_extruder]=="PETG"}
 M104 S[petg_standby_temp] A          ; PETG: standby temp
+{endif}
+{if filament_type[initial_no_support_extruder]=="PETG-CF"}
+M104 S[petgcf_standby_temp] A          ; PETG-CF: standby temp
 {endif}
 {if filament_type[initial_no_support_extruder]=="TPU"}
 M104 S[tpu_standby_temp] A          ; TPU: standby temp
@@ -447,8 +457,14 @@ M400
 {if filament_type[initial_no_support_extruder]=="PLA"}
 G4 S[pla_soak_time]               ; PLA: soak
 {endif}
+{if filament_type[initial_no_support_extruder]=="PLA-CF"}
+G4 S[placf_soak_time]               ; PLA-CF: soak
+{endif}
 {if filament_type[initial_no_support_extruder]=="PETG"}
 G4 S[petg_soak_time]               ; PETG: soak
+{endif}
+{if filament_type[initial_no_support_extruder]=="PETG-CF"}
+G4 S[petgcf_soak_time]               ; PETG-CF: soak
 {endif}
 {if filament_type[initial_no_support_extruder]=="TPU"}
 G4 S[tpu_soak_time]               ; TPU: soak

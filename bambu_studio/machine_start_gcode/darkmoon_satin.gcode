@@ -27,7 +27,7 @@
 ; Soak times (in seconds) - Satin has good thermal conductivity (modified PEI)
 ; Based on official Darkmoon Satin User Guide preheat recommendations
 {global_variable_3 pla_soak_time=0}           ; Satin: No preheat recommended
-{global_variable_3 petg_soak_time=60}         ; Satin: 1 min - Rarely preheat (use light soak)
+{global_variable_3 petg_soak_time=60}         ; Satin: 1 min - Light preheat recommended
 {global_variable_3 tpu_soak_time=0}           ; Satin: ambient temp, no preheat
 {global_variable_3 abs_soak_time=180}         ; Satin: 3 min - Sometimes preheat
 {global_variable_3 asa_soak_time=180}         ; Satin: 3 min - Sometimes preheat

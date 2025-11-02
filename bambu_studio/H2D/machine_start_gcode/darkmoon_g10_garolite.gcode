@@ -28,11 +28,11 @@
 {global_variable_3 support_standby_temp=140}
 
 ; Soak times (in seconds)
-{global_variable_3 pla_soak_time=60}
-{global_variable_3 placf_soak_time=60}
+{global_variable_3 pla_soak_time=30}
+{global_variable_3 placf_soak_time=30}
 {global_variable_3 petg_soak_time=90}
 {global_variable_3 petgcf_soak_time=90}
-{global_variable_3 tpu_soak_time=30}
+{global_variable_3 tpu_soak_time=0}
 {global_variable_3 abs_soak_time=240}
 {global_variable_3 asa_soak_time=240}
 {global_variable_3 pc_soak_time=300}
@@ -41,11 +41,11 @@
 {global_variable_3 pa6gf_soak_time=300}
 {global_variable_3 pa6cf_soak_time=300}
 {global_variable_3 pahtcf_soak_time=300}
-{global_variable_3 petcf_soak_time=300}
+{global_variable_3 petcf_soak_time=240}
 {global_variable_3 ppacf_soak_time=330}
 {global_variable_3 ppscf_soak_time=330}
-{global_variable_3 pva_soak_time=60}
-{global_variable_3 support_soak_time=60}
+{global_variable_3 pva_soak_time=30}
+{global_variable_3 support_soak_time=30}
 ;===== END FILAMENT-SPECIFIC VARIABLES =====
 
 ;M1002 set_flag extrude_cali_flag=1

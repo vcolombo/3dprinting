@@ -61,28 +61,30 @@ Each build plate has unique thermal properties requiring different soak times:
 
 ### Optimization Strategy: "Heat-Level-Soak" Sequence
 
-The start G-code implements a specific optimization to minimize print start time while preventing nozzle oozing:
+The start G-code implements aggressive optimizations to minimize print start time while preventing nozzle oozing:
 
-1. **Parallel heating** (~line 95): Bed and nozzle start heating simultaneously (NOT sequentially)
-2. **Wait for both** (~line 100-160): Wait for bed, then wait for nozzle standby temp
-3. **Bed leveling at standby temps** (~line 405): Perform G29 leveling without oozing (no re-wait needed)
-4. **Z offset calibration** (~line 445): Uses same material-specific standby temps (no re-wait needed)
-5. **Chamber heating and material soak** (~line 515): Dwell at standby temp for plate-specific duration
+1. **Parallel bed + nozzle heating** (~line 95): Both heat simultaneously with M140/M104, then wait with M190/M109
+2. **Parallel chamber heating** (~line 410): Chamber starts heating (M141) BEFORE leveling begins
+3. **Bed leveling at standby temps** (~line 405-445): G29 runs without oozing, chamber heating in parallel
+4. **Z offset calibration** (~line 445-515): Uses material-specific standby temps, chamber still heating
+5. **Chamber wait + material soak** (~line 515-580): Wait for chamber (if needed), then plate-specific soak
 6. **Final heating** (~line 630): Rise to print temperature just before printing
 
 **Why this matters**:
 
-- **Parallel heating** saves 30-90 seconds by heating bed and nozzle simultaneously instead of sequentially
-- **No redundant waits** - bed/nozzle temps are maintained throughout, no need to re-check before leveling or Z offset
-- **Aggressive pre-heating** during detection phase (print_temp - 50°C instead of -80°C) saves 10-20 seconds
-- Traditional sequences waste time with sequential heating and redundant temperature checks
+- **Parallel bed/nozzle heating**: Saves 30-90s by heating simultaneously instead of sequentially
+- **Parallel chamber heating**: Saves additional 30-60s by overlapping with leveling/Z offset (ABS/ASA/PC)
+- **No redundant waits**: Temperatures maintained throughout, eliminated 2 unnecessary M190 re-checks
+- **Aggressive pre-heating**: Detection phase heats to print_temp-50°C instead of -80°C (saves 10-20s)
+- Traditional sequences waste time with sequential operations and redundant temperature checks
 
 **Key optimizations implemented**:
 
-- Removed sequential M190 → M104 pattern in favor of M140 → M104 → M190 → M109 (parallel)
-- Eliminated 2 redundant `M190 S[bed_temperature_initial_layer_single]` calls (before leveling and Z offset)
-- Changed detection phase pre-heat from -80°C to -50°C offset for faster approach to standby temp
-- **Total time savings: 45-120 seconds per print** depending on material and bed size
+- Parallel heating pattern: M140 → M104 → M190 → M109 (replaced sequential M190 → M104)
+- Chamber heating moved from after Z offset to before leveling (M141 at ~line 410 instead of ~line 520)
+- Eliminated 2 redundant `M190 S[bed_temperature_initial_layer_single]` calls
+- Changed detection pre-heat from -80°C to -50°C offset
+- **Total time savings: 75-180 seconds per print** (45-120s from heating + 30-60s from chamber parallelization)
 
 **Status Messages**: Added `M1002 gcode_claim_action` commands throughout to display progress in Bambu Studio:
 
@@ -125,9 +127,9 @@ M104 S160 A          ; PETG: standby temp 160C
 bambu_studio/
   H2D/
     machine_start_gcode/
-      darkmoon_g10_garolite.gcode     # H2D with G10/Garolite plate (756 lines)
-      darkmoon_cfx_carbonfiber.gcode  # H2D with CFX Carbon Fiber plate (757 lines)
-      darkmoon_satin.gcode            # H2D with Satin Modified PEI plate (757 lines)
+      darkmoon_g10_garolite.gcode     # H2D with G10/Garolite plate (761 lines)
+      darkmoon_cfx_carbonfiber.gcode  # H2D with CFX Carbon Fiber plate (762 lines)
+      darkmoon_satin.gcode            # H2D with Satin Modified PEI plate (762 lines)
 ```
 
 **Naming Convention**: `darkmoon_{plate_type}.gcode` - Named for build surface. Machine type (H2D) in header comments.
@@ -138,10 +140,11 @@ bambu_studio/
 - Lines 15-95: Machine initialization and airduct setup
 - Lines 95-225: Parallel bed + nozzle heating with M109 waits for both
 - Lines 225-405: Homing, detection, material prep, extrusion calibration
-- Lines 405-445: Bed leveling at standby temps (no redundant M190)
-- Lines 445-515: Z offset calibration with material-specific temps (no redundant M190)
-- Lines 515-580: Chamber heating and material soak conditionals
-- Lines 580-755: Mech calibration, XY offset, final heating, purge line
+- Lines 405-420: Chamber heating start (M141, parallel with leveling)
+- Lines 420-445: Bed leveling at standby temps (no redundant M190)
+- Lines 445-515: Z offset calibration with material-specific temps (chamber still heating)
+- Lines 515-580: Chamber wait (M191) + material soak conditionals
+- Lines 580-765: Mech calibration, XY offset, final heating, purge line
 
 ## Editing Guidelines
 

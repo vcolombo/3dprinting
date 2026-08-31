@@ -2,37 +2,54 @@
 
 ## Repository Purpose
 
-Custom G-code start sequences for Bambu Lab 3D printers, specifically optimized for the H2D machine with different build plate surfaces (G10/Garolite and CFX Carbon Fiber).
+Custom G-code start sequences for Bambu Lab 3D printers, specifically optimized for the H2D machine with different build plate surfaces (G10/Garolite, CFX Carbon Fiber, and Satin Modified PEI).
 
 ## G-code File Architecture
 
-### Variable-Driven Configuration Pattern
+### Hardcoded Configuration Pattern
 
-All G-code files use **top-level variables** for material-specific parameters to enable easy customization without searching through the entire file:
+**CRITICAL**: Bambu Studio does NOT support custom variable definitions (`{global_variable_3 ...}` syntax). All material-specific parameters are **hardcoded directly in conditional blocks**.
 
 ```gcode
-{global_variable_3 pla_standby_temp=140}
-{global_variable_3 pla_soak_time=60}
+{if filament_type[initial_no_support_extruder]=="PLA"}
+M104 S140 A          ; PLA: standby temp 140C
+{endif}
 ```
 
-**Critical Pattern**: When adding new filament support or modifying heating behavior:
+**When adding new filament support or modifying heating behavior**:
 
-1. Define variables at the top of the file (lines 5-45)
-2. Reference them in conditional blocks using `[variable_name]` syntax
-3. Never hardcode temperatures or times in the execution sections
+1. Locate the material-specific conditional blocks (~line 100 for standby temps, ~line 410 for soak times)
+2. Add new conditional with hardcoded values
+3. **Repeat for ALL plate configurations** - each may have different soak times but same standby temps
 
 ### Build Plate Specific Configurations
 
 Each build plate has unique thermal properties requiring different soak times:
 
-- **G10/Garolite** (`darkmoon_g10_garolite.gcode`): Standard soak times for glass-reinforced epoxy
-- **CFX Carbon Fiber** (`darkmoon_cfx_carbonfiber.gcode`): Adjusted soak times based on [official user guide](https://darkmoon3d.com/pages/darkmoon-cfx-carbon-fiber-build-plate-user-guide)
-  - Carbon fiber is an excellent thermal insulator requiring plate-specific preheat strategies
+- **G10/Garolite** (`darkmoon_g10_garolite.gcode`): Standard soak times for glass-reinforced epoxy (baseline configuration)
+- **CFX Carbon Fiber** (`darkmoon_cfx_carbonfiber.gcode`): Adjusted soak times for excellent thermal insulator
+  - Carbon fiber requires plate-specific preheat strategies per manufacturer specs
   - Some materials require NO preheat (PLA, TPU, PPS-CF: 0s)
   - Some materials ALWAYS preheat (PETG: 180s, PC: 300s)
   - Engineering materials use moderate times (PA/PET-CF: 120-240s)
+- **Satin Modified PEI** (`darkmoon_satin.gcode`): Reduced soak times for good thermal conductor
+  - Modified PEI polymer with excellent thermal conductivity
+  - Shorter preheat times (PLA/TPU/PVA: 0s, PETG: 60s, most engineering: 180s)
 
-**When creating new plate configs**: Copy an existing file and adjust soak times based on manufacturer specifications. Standby temps remain the same across plates.
+**When creating new plate configs**: Copy an existing file and adjust soak times in conditional blocks based on manufacturer specifications. Standby temps (120-240°C) remain the same across all plates.
+
+### Special Cases: Material-Specific Adhesion Behavior
+
+#### PPS-CF on CFX Carbon Fiber: Zero Soak Despite High Standby Temperature
+
+PPS-CF is unique - it uses **0s soak time** on CFX despite having the highest standby temperature (240°C). This is intentional:
+
+- **Chemical bonding (van der Waals forces)** occurs instantly at 240°C standby temperature
+- Extended thermal soak does NOT improve adhesion (unlike PC, which is thermally-dependent)
+- Longer soak actually risks thermal drift/warping before printing starts
+- This is manufacturer-tested and validated behavior
+
+When adding materials with chemical adhesion properties, research the adhesion mechanism before assuming thermal soak helps.
 
 ### Optimization Strategy: "Heat-Level-Soak" Sequence
 
@@ -51,24 +68,26 @@ Material-specific behavior uses nested conditionals checking `filament_type[init
 
 ```gcode
 {if filament_type[initial_no_support_extruder]=="PLA"}
-M104 S[pla_standby_temp] A
+M104 S140 A          ; PLA: standby temp 140C
 {endif}
 ```
 
 **Pattern**: 18 supported filament types (PLA, PLA-CF, PETG, PETG-CF, TPU, ABS, ASA, PC, PA, PA-CF, PA6-GF, PA6-CF, PAHT-CF, PET-CF, PPA-CF, PPS-CF, PVA, Support) each requiring:
 
-- Standby temperature definition (same across all plates)
-- Soak time definition (plate-specific)
-- Conditional block for standby temp assignment (line ~140)
-- Conditional block for soak time execution (line ~445)
+- Standby temperature hardcoded in conditional (same across all plates: 120-240°C)
+- Soak time hardcoded in conditional (plate-specific: 0-330s)
+- Conditional block for standby temp assignment (~line 100)
+- Conditional block for soak time execution (~line 410)
 
 ## File Organization
 
 ```
 bambu_studio/
-  machine_start_gcode/
-    darkmoon_g10_garolite.gcode     # H2D with G10/Garolite plate
-    darkmoon_cfx_carbonfiber.gcode  # H2D with CFX Carbon Fiber plate
+  H2D/
+    machine_start_gcode/
+      darkmoon_g10_garolite.gcode     # H2D with G10/Garolite plate
+      darkmoon_cfx_carbonfiber.gcode  # H2D with CFX Carbon Fiber plate
+      darkmoon_satin.gcode            # H2D with Satin Modified PEI plate
 ```
 
 **Naming Convention**: `darkmoon_{plate_type}.gcode` - Files are named for the build surface material. Machine type (H2D) is documented in header comments.
@@ -77,17 +96,29 @@ bambu_studio/
 
 ### Adding New Filament Type
 
-1. Add `{global_variable_3 newmat_standby_temp=XXX}` in variables section (lines 9-24)
-2. Add `{global_variable_3 newmat_soak_time=XXX}` in variables section (lines 27-43)
-3. Add conditional block at line ~140 (standby temp assignment)
-4. Add conditional block at line ~450 (soak time execution)
-5. **Repeat for ALL plate configurations** - each plate may have different soak times
+1. Add conditional block at ~line 100 (standby temp assignment):
+
+```gcode
+{if filament_type[initial_no_support_extruder]=="NEWMAT"}
+M104 S180 A          ; NEWMAT: standby temp 180C
+{endif}
+```
+
+2. Add conditional block at ~line 410 (soak time execution):
+
+```gcode
+{if filament_type[initial_no_support_extruder]=="NEWMAT"}
+G4 S120              ; NEWMAT: soak 120s
+{endif}
+```
+
+3. **Repeat for ALL plate configurations** - each plate may have different soak times but same standby temps
 
 ### Adding New Build Plate Configuration
 
 1. Copy the most similar existing plate config file
 2. Update header comments: date, build plate name, user guide link (if available)
-3. Adjust soak time variables based on plate's thermal properties and manufacturer specs
+3. Adjust soak time values in conditional blocks (~line 410) based on plate's thermal properties and manufacturer specs
 4. Keep standby temperatures unchanged (material property, not plate property)
 5. Test with representative materials to verify heating timing
 
@@ -109,24 +140,6 @@ When manufacturer specifications aren't available, use this methodology to deter
 4. **Document findings**: Add inline comments with rationale for chosen times
 5. **Iterate**: Test with materials at thermal extremes (PLA, PA, PC)
 
-### Machine-Specific Considerations
-
-When adapting G-code for different Bambu Lab machines:
-
-- **H2D** (current focus): Large 350mm bed, dual extruders, requires longer heating times
-- **X1C/P1**: Standard 256mm bed, faster heating, reduce soak times by ~20%
-- **A1/A1 Mini**: Smaller bed (184mm mini), much faster heating, reduce soak by ~40%
-
-**Machine-specific variables to consider**:
-
-- Bed size affects thermal mass (larger = more soak time)
-- Heated chamber presence (X1C has chamber, affects ABS/ASA strategy)
-- Extruder configuration (single vs dual affects toolhead calibration sequence)
-
-**Naming convention for machine variants**: `{machine}_{plate_type}.gcode`
-
-- Example: `x1c_cfx_carbonfiber.gcode`, `a1mini_g10_garolite.gcode`
-
 ### Build Plate Thermal Property Reference
 
 For future plate additions, common build surfaces and their characteristics:
@@ -145,8 +158,9 @@ Use this as starting point, then apply testing methodology above to refine.
 
 ### Modifying Heating Behavior
 
-- **Standby temps**: Adjust variable values at top (typically print_temp - 50-80°C)
-- **Soak times**: Based on material thermal mass AND plate thermal properties
+- **Standby temps**: Adjust hardcoded values in conditional blocks at ~line 100 (typically print_temp - 50-80°C)
+- **Soak times**: Adjust hardcoded values in conditional blocks at ~line 410
+  - Based on material thermal mass AND plate thermal properties
   - Reference manufacturer documentation when available
   - Consider plate material (glass, carbon fiber, PEI) as thermal insulator/conductor
 - Do not modify the sequence order without understanding the optimization strategy
@@ -170,3 +184,77 @@ The G-code uses Bambu Studio's templating system:
 - Monitor for nozzle oozing during leveling (indicates standby temp too high)
 - Check total preheat time hasn't increased significantly
 - For new plate configs: test with materials at extremes (PLA, PETG, PA, PC) to verify behavior
+
+## Version Control Workflow
+
+### Branch Strategy
+
+- `main` - Stable, tested configurations ready for production use
+- Feature branches - Use descriptive names for changes:
+  - `add-{material-name}` - Adding new filament type support
+  - `add-{plate-name}` - Adding new build plate configuration
+  - `fix-{issue-description}` - Bug fixes or timing adjustments
+  - `optimize-{improvement}` - Performance or sequence optimizations
+
+### Commit Message Format
+
+```
+<type>: <short description>
+
+<detailed explanation if needed>
+
+Affected files:
+- darkmoon_g10_garolite.gcode
+- darkmoon_cfx_carbonfiber.gcode
+- darkmoon_satin.gcode
+```
+
+**Types**:
+
+- `feat`: New filament type or plate configuration
+- `fix`: Correction to temps, times, or sequence
+- `refactor`: Code reorganization without behavior change
+- `docs`: Documentation updates only
+- `test`: Testing methodology or validation changes
+
+**Examples**:
+
+```
+feat: add ASA support to all plate configs
+
+Added ASA with 170C standby temp and plate-specific soak times:
+- G10: 240s (similar to ABS)
+- CFX: 240s (manufacturer recommended)
+- Satin: 180s (good conductor)
+
+Affected files:
+- darkmoon_g10_garolite.gcode
+- darkmoon_cfx_carbonfiber.gcode
+- darkmoon_satin.gcode
+```
+
+```
+fix: reduce PETG soak time on Satin from 90s to 60s
+
+Testing showed 90s was excessive for Satin's high thermal conductivity.
+First layer adhesion remained excellent at 60s with faster start time.
+
+Affected files:
+- darkmoon_satin.gcode
+```
+
+### Before Committing Changes
+
+1. **Verify syntax**: Check all three files if adding new material
+2. **Test in Bambu Studio**: Ensure G-code parses without errors
+3. **Update line number references**: If adding/removing large blocks, update documentation
+4. **Document rationale**: Add inline comments explaining non-obvious values (especially special cases like PPS-CF)
+
+### Pull Request Guidelines
+
+When creating PRs for collaborative work:
+
+1. Title should match commit message format
+2. Include test results (which materials tested, any issues observed)
+3. Reference manufacturer documentation if applicable
+4. Note any deviations from baseline values with justification
